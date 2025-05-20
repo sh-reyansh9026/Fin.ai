@@ -1,8 +1,16 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { getAccountWithTransactions } from "@/actions/accounts"; // Import the function to get account data
 import { notFound } from "next/navigation"; // Import the notFound function to handle 404 pages
+import TransactionTable from "../_components/transaction-table"; // Import the TransactionTable component
+import { BarLoader } from "react-spinners"; // Import the BarLoader component for loading state
+import AccountChart from "../_components/account-chart"; // Import the AccountChart component
 
 const AccountsPage = async ({ params }) => {
+  // an error will occur and to fix elow commented code will be used as bcoz.his usually happens when you're trying to use params.id directly in the top-level async component
+  // const AccountsPage = async (props) => {
+  //   const { params } = await props;
+  //   const accountData = await getAccount(params.id);
+
   const accountData = await getAccountWithTransactions(params.id); // get the account data with transactions
 
   if (!accountData) {
@@ -35,8 +43,18 @@ const AccountsPage = async ({ params }) => {
       </div>
 
       {/*Chart Section*/}
+      <Suspense
+        fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
+      >
+        <AccountChart transactions={transactions} />
+      </Suspense>
 
       {/* Transactions Table */}
+      <Suspense
+        fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
+      >
+        <TransactionTable transactions={transactions} />
+      </Suspense>
     </div>
   );
 };

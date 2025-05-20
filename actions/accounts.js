@@ -114,8 +114,75 @@ export async function getAccountWithTransactions(accountId) {
 
         return {
             ...serializeTransaction(account), // return the serialized Transaction
-            transactions: account.transaction.map(serializeTransaction),
+            transactions: account.transactions.map(serializeTransaction),
         }; 
+}
 
-    
+
+export async function bulkDeleteTransactions(transactionIds) {
+    try {
+        const { userId } = await auth(); // get the userId from the auth object from frontend
+        if (!userId) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await db.user.findUnique({
+            where: {
+                clerkUserId: userId, // this is the userId from auth object which is compared to the clerkUserId in db
+            }
+        });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const transactions = await db.transaction.findMany({
+            where: {
+                id: {
+                    in: transactionIds, // check if the transactionId is in the array of transactionIds
+                },
+                userId: user.id, // check if the userId is same as the userId in db
+            }
+        });
+
+        // it is change in account balance not the actual account balance
+        const accountBalanceChanges = transactions.reduce((acc, transaction) => {
+            const change = transaction.type === "EXPENSE"
+                ? transaction.amount  // if EXPENSE then that transaction is deleted and its balance will be added so positive
+                : -transaction.amount; 
+                acc[transaction.accountId] = (acc[transaction.accountId] || 0) + change; // add the change to the account balance as if the transaction is done by different accounts so one accountId will be craeted for the user
+            return acc; // return the account balance changes
+        }, {});
+
+        // Delete the transactions and update the account balances in a single transaction
+        await db.$transaction(async (tx) => { // here $transaction is a function of prisma not the variable transaction
+            // Delete the transactions
+            await tx.transaction.deleteMany({
+                where: {
+                    id: { in: transactionIds }, // check if the transactionId is in the array of transactionIds
+                    userId: user.id, // check if the userId is same as the userId in db
+                }
+            })
+            // Update the account balances
+            for (const [accountId, balanceChange] of Object.entries(
+                accountBalanceChanges
+              )) {
+                await tx.account.update({
+                    where: {
+                        id: accountId, // check if the accountId is same as the accountId in db
+                    },
+                    data: {
+                        balance: {
+                            increment: balanceChange, // increment the balance by the balance change
+                        }
+                    }
+                })
+            }
+        })
+
+        revalidatePath("/dashboard"); // revalidate the path when account gets updated
+        revalidatePath("/account/[id]"); // revalidate the path when account gets updated
+
+        return { success: true }; // return the success message
+    } catch (error) {
+        return { success: false, error: error.message }; // return the error message
+    }
 }
