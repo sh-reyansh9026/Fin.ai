@@ -16,6 +16,7 @@ async function DashboardPage() {
   if (defaultAccount) {
     budgetData = await getCurrentBudget(defaultAccount.id); // .id gives the id of the default account
   }
+  // console.log("budgetData", budgetData);
 
   return (
     <div className="px-5">
