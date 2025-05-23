@@ -1,27 +1,18 @@
 "use client";
 
-import { endOfDay, startOfDay, subDays } from "date-fns";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
-  Bar,
   BarChart,
-  CartesianGrid,
-  Legend,
-  Rectangle,
-  ResponsiveContainer,
-  Tooltip,
+  Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
+import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -29,8 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { format } from "date-fns";
 
 const DATE_RANGES = {
   "7D": { label: "Last 7 Days", days: 7 },
@@ -55,27 +44,25 @@ const AccountChart = ({ transactions }) => {
       (t) => new Date(t.date) >= startDate && new Date(t.date) <= endOfDay(now)
     );
 
-    const grouped = filtered.reduce((acc, transaction) => {
-      const date = format(new Date(transaction.date), "MMM dd");
-      if (!acc[date]) {
-        acc[date] = { date, income: 0, expense: 0 };
-      }
-
-      if (transaction.type === "INCOME") {
-        acc[date].income += transaction.amount;
-      } else {
-        acc[date].expense += transaction.amount;
-      }
-
-      return acc;
-    }, {});
+   // Group transactions by date
+   const grouped = filtered.reduce((acc, transaction) => {
+    const date = format(new Date(transaction.date), "MMM dd");
+    if (!acc[date]) {
+      acc[date] = { date, income: 0, expense: 0 };
+    }
+    if (transaction.type === "INCOME") {
+      acc[date].income += transaction.amount;
+    } else {
+      acc[date].expense += transaction.amount;
+    }
+    return acc;
+  }, {});
 
     // Convert the grouped object into an array and sort it by date
     return Object.values(grouped).sort(
       (a, b) => new Date(a.date) - new Date(b.date)
     );
-  }, [dateRange, transactions]);
-
+  }, [transactions, dateRange]);
   // as if we are selecting monthly daily or yearly then we need the total balance of amount to show in bar Chart
   const totals = useMemo(() => {
     return filteredData.reduce(
@@ -84,7 +71,7 @@ const AccountChart = ({ transactions }) => {
         income: acc.income + day.income, // total income of days in date range
         expense: acc.expense + day.expense, // total expense of days in date range
       }),
-      { income: 0, expense: 0 }
+      { income: 0, expense: 0 } // initial values
     );
   }, [filteredData]);
 
@@ -99,13 +86,11 @@ const AccountChart = ({ transactions }) => {
             <SelectValue placeholder="Select range" />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(DATE_RANGES).map(([key, { label }]) => {
-              return (
-                <SelectItem key={key} value={key}>
-                  {label}
-                </SelectItem>
-              );
-            })}
+            {Object.entries(DATE_RANGES).map(([key, { label }]) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </CardHeader>
@@ -182,6 +167,5 @@ const AccountChart = ({ transactions }) => {
       </CardContent>
     </Card>
   );
-};
-
+}
 export default AccountChart;

@@ -26,6 +26,7 @@ export async function getCurrentBudget(accountId) {
                 userId: user.id,
             }
         });
+        // console.log("budget", budget);
 
         const currentDate = new Date();
         const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -34,6 +35,7 @@ export async function getCurrentBudget(accountId) {
         const expenses = await db.transaction.aggregate({ // transaction from databse prisma schema
             where: {
                 userId: user.id,
+                type: "EXPENSE",
                 date: {
                     gte: startOfMonth, // graeter than or equal to start of month
                     lte: endOfMonth, // less than or equal to end of month
@@ -44,14 +46,14 @@ export async function getCurrentBudget(accountId) {
                 amount: true,
             }
         });
+        // console.log("expenses", expenses);
 
         return {
-            budget: budget ? {
-                ...budget,
-                amount: budget.amount.toNumber(),
-            } : null,
-            currentExpenses: expenses._sum.amount ? expenses._sum.amount.toNumber() : 0,
-        }
+            budget: budget ? { ...budget, amount: budget.amount.toNumber() } : null,
+            currentExpenses: expenses._sum.amount
+              ? expenses._sum.amount.toNumber()
+              : 0,
+          };
     } catch (error) {
         console.error("Error fetching budget:", error);
         throw error;
@@ -81,11 +83,11 @@ export async function updateBudget(amount) {
                 userId: user.id,
             },
             update: {
-                amount: amount,
+                amount,
             },
             create: {
                 userId: user.id,
-                amount: amount,
+                amount,
             }
         });
 
