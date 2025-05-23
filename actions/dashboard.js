@@ -135,3 +135,32 @@ export async function getUserAccounts() {
     const serializedAccount = accounts.map(serializeTransaction) // serialize the account to convert the decimal value to number
     return serializedAccount; // return the serialized account
 }
+
+
+export async function getDashboardData() {
+    const { userId } = await auth(); // get the userId from the auth object from frontend
+    if (!userId) { // if user is not signed in means userId is not found, then throw an error
+        throw new Error("Unauthorized");
+    }
+
+    // if userId is there then check if user is present in db or user is here to signup for first time 
+    const user = await db.user.findUnique({
+        where: {
+            clerkUserId: userId, // this is the userId from auth object which is compared to the clerkUserId in db
+        }
+    });
+
+    // if user is not found then throw an error that user is not found
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    // Get all user transactions
+    const transactions = await db.transaction.findMany({
+        where: { userId: user.id },
+        orderBy: { date: "desc" }, // order by date in descending order
+    });
+    
+    return transactions.map(serializeTransaction) // serialize the transaction to convert the decimal value to number
+
+}

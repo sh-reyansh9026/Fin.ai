@@ -1,13 +1,15 @@
-import React from "react";
-import { CreateAccountDrawer } from "@/components/create-account-drawer";
-import { Plus } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Suspense } from "react";
 import { getUserAccounts } from "@/actions/dashboard";
-import AccountCard from "./_components/account-card";
+import { getDashboardData } from "@/actions/dashboard";
 import { getCurrentBudget } from "@/actions/budget";
-import { BudgetProgress } from "@/app/(main)/dashboard/_components/budget-progress";
+import AccountCard from "./_components/account-card";
+import { CreateAccountDrawer } from "@/components/create-account-drawer";
+import { BudgetProgress } from "./_components/budget-progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus } from "lucide-react";
+import { DashboardOverview } from "./_components/transaction-overview";
 
-async function DashboardPage() {
+export default async function DashboardPage() {
   const accounts = await getUserAccounts();
 
   const defaultAccount = accounts?.find((account) => account.isDefault); // Find the default account
@@ -17,6 +19,8 @@ async function DashboardPage() {
     budgetData = await getCurrentBudget(defaultAccount.id); // .id gives the id of the default account
   }
   // console.log("budgetData", budgetData);
+
+  const transaction = await getDashboardData(); // get the transactions of the user
 
   return (
     <div className="px-5">
@@ -29,6 +33,12 @@ async function DashboardPage() {
       )}
 
       {/*Overview */}
+      <Suspense fallback={"Loading Overview..."}>
+        <DashboardOverview
+          accounts={accounts}
+          transactions={transaction || []}
+        />
+      </Suspense>
 
       {/*Accounts Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -49,5 +59,3 @@ async function DashboardPage() {
     </div>
   );
 }
-
-export default DashboardPage;
