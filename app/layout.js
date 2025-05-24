@@ -1,11 +1,8 @@
 // app/layout.tsx
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Fin.AI",
@@ -14,9 +11,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ClerkProvider>
+    <ClerkProvider>
+      <html lang="en">
+        <body>
           <Header />
           <main className="min-h-screen">{children}</main>
           <Toaster richColors />
@@ -25,8 +22,8 @@ export default function RootLayout({ children }) {
               <p>© 2025 AI Finance. All rights reserved.</p>
             </div>
           </footer>
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
