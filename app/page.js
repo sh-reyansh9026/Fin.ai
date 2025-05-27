@@ -5,8 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export default function Home() {
+  const[isMobileOpen, setIsMobileOpen] = useState(false);
+
+  const toggleOpen = () => {
+    if(window.innerWidth < 768){
+      setIsMobileOpen(!isMobileOpen);
+    }
+  };
   
   return (
     <div className="mt-40">
@@ -23,7 +31,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+{/*Everything you need to manage your finances */}
       <section className="py-20">
   <div className="container mx-auto px-4">
     <h2 className="text-3xl font-bold text-center mb-12">
@@ -33,13 +41,18 @@ export default function Home() {
       {featuresData.map((feature, index) => (
         <div
           key={index}
-          className="group relative bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg overflow-hidden transition-all duration-300 px-6 pt-6 flex flex-col items-center text-center h-[150px] hover:h-[180px] max-w-[250px] mx-auto"
+          onClick={toggleOpen}
+          className="group relative bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg overflow-hidden transition-all duration-300 px-6 pt-6 flex flex-col items-center text-center h-[150px] hover:h-[180px] max-w-[250px] mx-auto cursor-pointer"
         >
           <div className="text-blue-600 text-4xl pb-2">
             {feature.icon}
           </div>
           <h3 className="text-lg font-semibold pt-2">{feature.title}</h3>
-          <p className="text-gray-600 text-sm opacity-0 group-hover:opacity-100 transition-opacity mt-2 duration-300">
+          <p className={`text-gray-600 text-sm opacity-0 group-hover:opacity-100 transition-opacity mt-2 duration-300
+            ${
+              isMobileOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }
+            `}>
             {feature.description}
           </p>
         </div>
