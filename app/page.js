@@ -1,3 +1,4 @@
+"use client"
 import HeroSection from "../components/hero";
 import { howItWorksData, statsData, testimonialsData } from "@/data/landing";
 import { featuresData } from "@/data/landing";
