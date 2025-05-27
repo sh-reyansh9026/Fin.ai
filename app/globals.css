@@ -2,6 +2,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -138,7 +151,7 @@
 }
 
 .hero-image-wrapper {
-  perspective: 1000px;;
+  perspective: 1000px;
 }
 
 .hero-image {
