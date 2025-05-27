@@ -1,4 +1,4 @@
-"use client"
+
 import HeroSection from "../components/hero";
 import { howItWorksData, statsData, testimonialsData } from "@/data/landing";
 import { featuresData } from "@/data/landing";
@@ -6,16 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+
 
 export default function Home() {
-  const[isMobileOpen, setIsMobileOpen] = useState(false);
-
-  const toggleOpen = () => {
-    if(window.innerWidth < 768){
-      setIsMobileOpen(!isMobileOpen);
-    }
-  };
   
   return (
     <div className="mt-40">
@@ -42,18 +35,13 @@ export default function Home() {
       {featuresData.map((feature, index) => (
         <div
           key={index}
-          onClick={toggleOpen}
-          className="group relative bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg overflow-hidden transition-all duration-300 px-6 pt-6 flex flex-col items-center text-center h-[150px] hover:h-[180px] max-w-[250px] mx-auto cursor-pointer"
+          className="group relative bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg overflow-hidden transition-all duration-300 px-6 pt-6 flex flex-col items-center text-center h-[150px] hover:h-[180px] max-w-[250px] mx-auto"
         >
           <div className="text-blue-600 text-4xl pb-2">
             {feature.icon}
           </div>
           <h3 className="text-lg font-semibold pt-2">{feature.title}</h3>
-          <p className={`text-gray-600 text-sm opacity-0 group-hover:opacity-100 transition-opacity mt-2 duration-300
-            ${
-              isMobileOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-            }
-            `}>
+          <p className="text-gray-600 text-sm opacity-0 group-hover:opacity-100 transition-opacity mt-2 duration-300">
             {feature.description}
           </p>
         </div>
