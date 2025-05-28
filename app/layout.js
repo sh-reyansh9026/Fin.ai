@@ -1,5 +1,6 @@
 // app/layout.tsx
-import "./globals.css";
+import './globals.css'
+
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
