@@ -1,12 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
 
 @keyframes marquee {
   0% {
     transform: translateX(0%);
   }
-
   100% {
     transform: translateX(-50%);
   }
@@ -129,7 +128,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
   }
@@ -137,26 +135,18 @@
 
 @layer utilities {
   .gradient {
-    background-image: linear-gradient(to bottom right, #2563eb, #8b5cf6);
-    /* from-blue-600 to-purple-600 */
+    background-image: linear-gradient(to bottom right, #2563eb, #8b5cf6); /* from-blue-600 to-purple-600 */
   }
 
   .gradient-title {
-    background-image: linear-gradient(to bottom right, #2563eb, #8b5cf6);
-    /* from-blue-600 to-purple-600 */
-    font-weight: 800;
-    /* font-extrabold */
-    letter-spacing: -0.05em;
-    /* tracking-tighter */
-    padding-right: 0.5rem;
-    /* pr-2 */
-    padding-bottom: 0.5rem;
-    /* pb-2 */
-    color: transparent;
-    /* text-transparent */
+    background-image: linear-gradient(to bottom right, #2563eb, #8b5cf6); /* from-blue-600 to-purple-600 */
+    font-weight: 800; /* font-extrabold */
+    letter-spacing: -0.05em; /* tracking-tighter */
+    padding-right: 0.5rem; /* pr-2 */
+    padding-bottom: 0.5rem; /* pb-2 */
+    color: transparent; /* text-transparent */
     -webkit-background-clip: text;
-    background-clip: text;
-    /* bg-clip-text */
+    background-clip: text; /* bg-clip-text */
   }
 }
 
@@ -170,7 +160,7 @@
   will-change: transform;
 }
 
-.hero-image.scrolled {
+.hero-image.scrolled{
   transform: rotateX(0deg) scale(1) translateY(40px);
 }
 
