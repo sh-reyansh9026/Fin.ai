@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getUserAccounts } from "@/actions/dashboard";
 import { getDashboardData } from "@/actions/dashboard";
 import { getCurrentBudget } from "@/actions/budget";
-import AccountCard from "./_components/account-card";
+import { AccountCard } from "./_components/account-card";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { BudgetProgress } from "./_components/budget-progress";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,51 +10,47 @@ import { Plus } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
 
 export default async function DashboardPage() {
-  const accounts = await getUserAccounts();
+  const [accounts, transactions] = await Promise.all([
+    getUserAccounts(),
+    getDashboardData(),
+  ]);
 
-  const defaultAccount = accounts?.find((account) => account.isDefault); // Find the default account
+  const defaultAccount = accounts?.find((account) => account.isDefault);
 
+  // Get budget for default account
   let budgetData = null;
   if (defaultAccount) {
-    budgetData = await getCurrentBudget(defaultAccount.id); // .id gives the id of the default account
+    budgetData = await getCurrentBudget(defaultAccount.id);
   }
-  // console.log("budgetData", budgetData);
-
-  const transaction = await getDashboardData(); // get the transactions of the user
 
   return (
-    <div className="px-5">
-      {/*Budget Progress */}
-      {defaultAccount && (
-        <BudgetProgress
-          initialBudget={budgetData?.budget}
-          currentExpenses={budgetData?.currentExpenses || 0}
-        />
-      )}
+    <div className="space-y-8">
+      {/* Budget Progress */}
+      <BudgetProgress
+        initialBudget={budgetData?.budget}
+        currentExpenses={budgetData?.currentExpenses || 0}
+      />
 
-      {/*Overview */}
-      <Suspense fallback={"Loading Overview..."}>
-        <DashboardOverview
-          accounts={accounts}
-          transactions={transaction || []}
-        />
-      </Suspense>
+      {/* Dashboard Overview */}
+      <DashboardOverview
+        accounts={accounts}
+        transactions={transactions || []}
+      />
 
-      {/*Accounts Grid */}
+      {/* Accounts Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CreateAccountDrawer>
           <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed">
-            <CardContent className="flex flex-col items-center justify-center h-full text-muted-foreground pt-5">
+            <CardContent className="flex flex-col items-center justify-center text-muted-foreground h-full pt-5">
               <Plus className="h-10 w-10 mb-2" />
               <p className="text-sm font-medium">Add New Account</p>
             </CardContent>
           </Card>
         </CreateAccountDrawer>
-
         {accounts.length > 0 &&
-          accounts?.map((account) => {
-            return <AccountCard key={account.id} account={account} />;
-          })}
+          accounts?.map((account) => (
+            <AccountCard key={account.id} account={account} />
+          ))}
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ const DATE_RANGES = {
   ALL: { label: "All Time", days: null },
 };
 
-const AccountChart = ({ transactions }) => {
+export function AccountChart({ transactions }) {
   const [dateRange, setDateRange] = useState("1M");
 
   const filteredData = useMemo(() => {
@@ -37,41 +37,41 @@ const AccountChart = ({ transactions }) => {
     const now = new Date();
     const startDate = range.days
       ? startOfDay(subDays(now, range.days))
-      : startOfDay(new Date(0)); // Start from epoch if no range is specified
+      : startOfDay(new Date(0));
 
-    // Filter transactions based on the selected date range i.e date between start and end date
+    // Filter transactions within date range
     const filtered = transactions.filter(
       (t) => new Date(t.date) >= startDate && new Date(t.date) <= endOfDay(now)
     );
 
-   // Group transactions by date
-   const grouped = filtered.reduce((acc, transaction) => {
-    const date = format(new Date(transaction.date), "MMM dd");
-    if (!acc[date]) {
-      acc[date] = { date, income: 0, expense: 0 };
-    }
-    if (transaction.type === "INCOME") {
-      acc[date].income += transaction.amount;
-    } else {
-      acc[date].expense += transaction.amount;
-    }
-    return acc;
-  }, {});
+    // Group transactions by date
+    const grouped = filtered.reduce((acc, transaction) => {
+      const date = format(new Date(transaction.date), "MMM dd");
+      if (!acc[date]) {
+        acc[date] = { date, income: 0, expense: 0 };
+      }
+      if (transaction.type === "INCOME") {
+        acc[date].income += transaction.amount;
+      } else {
+        acc[date].expense += transaction.amount;
+      }
+      return acc;
+    }, {});
 
-    // Convert the grouped object into an array and sort it by date
+    // Convert to array and sort by date
     return Object.values(grouped).sort(
       (a, b) => new Date(a.date) - new Date(b.date)
     );
   }, [transactions, dateRange]);
-  // as if we are selecting monthly daily or yearly then we need the total balance of amount to show in bar Chart
+
+  // Calculate totals for the selected period
   const totals = useMemo(() => {
     return filteredData.reduce(
-      // riggered when filteredData changes
       (acc, day) => ({
-        income: acc.income + day.income, // total income of days in date range
-        expense: acc.expense + day.expense, // total expense of days in date range
+        income: acc.income + day.income,
+        expense: acc.expense + day.expense,
       }),
-      { income: 0, expense: 0 } // initial values
+      { income: 0, expense: 0 }
     );
   }, [filteredData]);
 
@@ -168,4 +168,3 @@ const AccountChart = ({ transactions }) => {
     </Card>
   );
 }
-export default AccountChart;
