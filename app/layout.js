@@ -1,31 +1,36 @@
-// app/layout.js (or layout.tsx if using TypeScript)
+// app/layout.tsx
+import './globals.css'
 
-import { Inter } from "next/font/google";
-import "./globals.css";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
-
-const inter = Inter({ subsets: ["latin"] });
+import { ThemeProvider } from "next-themes";
 
 export const metadata = {
-  title: "Welth",
-  description: "One stop Finance Platform",
+  title: "Fin.AI",
+  description: "A finance platform powered by AI",
 };
 
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-      <html lang="en" className={inter.className}>
+      <html lang="en" suppressHydrationWarning>
         <body>
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Toaster richColors />
-          <footer className="bg-blue-50 py-12">
-            <div className="container mx-auto px-4 text-center text-gray-600">
-              <p>Made with 💗 by RoadsideCoder</p>
-            </div>
-          </footer>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Toaster richColors />
+            <footer className="bg-blue-950 py-12">
+              <div className="container mx-auto px-4 text-center text-white">
+                <p>© 2025 AI Finance. All rights reserved.</p>
+              </div>
+            </footer>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

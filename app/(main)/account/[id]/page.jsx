@@ -1,18 +1,23 @@
-import { Suspense } from "react";
-import { getAccountWithTransactions } from "@/actions/account";
-import { BarLoader } from "react-spinners";
-import { TransactionTable } from "../_components/transaction-table";
-import { notFound } from "next/navigation";
-import { AccountChart } from "../_components/account-chart";
+import React, { Suspense } from "react";
+import { getAccountWithTransactions } from "@/actions/accounts"; // Import the function to get account data
+import { notFound } from "next/navigation"; // Import the notFound function to handle 404 pages
+import TransactionTable from "../_components/transaction-table"; // Import the TransactionTable component
+import { BarLoader } from "react-spinners"; // Import the BarLoader component for loading state
+import AccountChart from "../_components/account-chart"; // Import the AccountChart component
 
-export default async function AccountPage({ params }) {
-  const accountData = await getAccountWithTransactions(params.id);
+const AccountsPage = async ({ params }) => {
+  // an error will occur and to fix elow commented code will be used as bcoz.his usually happens when you're trying to use params.id directly in the top-level async component
+  // const AccountsPage = async (props) => {
+  //   const { params } = await props;
+  //   const accountData = await getAccount(params.id);
+
+  const accountData = await getAccountWithTransactions(params.id); // get the account data with transactions
 
   if (!accountData) {
-    notFound();
+    notFound(); // If no account data is found, return a 404 page
   }
 
-  const { transactions, ...account } = accountData;
+  const { transactions, ...account } = accountData; // Destructure the account data to get transactions and account details
 
   return (
     <div className="space-y-8 px-5">
@@ -37,7 +42,7 @@ export default async function AccountPage({ params }) {
         </div>
       </div>
 
-      {/* Chart Section */}
+      {/*Chart Section*/}
       <Suspense
         fallback={<BarLoader className="mt-4" width={"100%"} color="#9333ea" />}
       >
@@ -52,4 +57,6 @@ export default async function AccountPage({ params }) {
       </Suspense>
     </div>
   );
-}
+};
+
+export default AccountsPage;
